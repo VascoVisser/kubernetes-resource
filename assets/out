@@ -39,7 +39,7 @@ fi
 kubectl_args_file="$(jq -r '.params.kubectl_args_file // ""' < "$payload")"
 if [[ -n "$kubectl_args_file" ]]; then
   if [[ ! -f "$kubectl_args_file" ]]; then
-    echoerr "kubeconfig file '$kubectl_args_file' does not exist"
+    echoerr "file '$kubectl_args_file' does not exist"
     exit 1
   fi
   kubectl_args="$(head -1 "$kubectl_args_file")"
