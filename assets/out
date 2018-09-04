@@ -35,7 +35,17 @@ if [[ -z "$kubectl_command" ]]; then
   exit 1
 fi
 
-IFS=" " read -r -a kubectl_arguments <<< "$(eval "echo $kubectl_command")"
+# Optional. Specify arguments to the kubectl operation in a file
+kubectl_args_file="$(jq -r '.params.kubectl_args_file // ""' < "$payload")"
+if [[ -n "$kubectl_args_file" ]]; then
+  if [[ ! -f "$kubectl_args_file" ]]; then
+    echoerr "kubeconfig file '$kubectl_args_file' does not exist"
+    exit 1
+  fi
+  kubectl_args="$(head -1 "$kubectl_args_file")"
+fi
+
+IFS=" " read -r -a kubectl_arguments <<< "$(eval "echo $kubectl_command $kubectl_args")"
 exe kubectl "${kubectl_arguments[@]}"
 
 # Optional. The number of seconds that waits until all pods are ready. Defaults to `30`.
